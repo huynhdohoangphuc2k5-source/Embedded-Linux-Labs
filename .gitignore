@@ -6,3 +6,11 @@
 .*.cmd
 *.order
 *.symvers
+
+# binaries
+asgn02/app/sms_app
+asgn02/app/sms_app_x86
+lab02/test_apps/code_ai
+lab02/test_apps/lech_hay_gap
+*.save
+lab03/apps/buggy_app

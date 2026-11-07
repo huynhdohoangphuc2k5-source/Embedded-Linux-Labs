@@ -1,18 +1,16 @@
-CC_ARM = arm-linux-gnueabihf-gcc
-CC_HOST = gcc
-CFLAGS = -Wall -Wextra -pthread -std=gnu99 -O2
-LDFLAGS = -lrt
+CC ?= gcc
+CFLAGS ?= -Wall -Wextra -pthread -O2
+LDFLAGS ?= -pthread -lrt -lm
 
-all: sms_app sms_app_x86 ioctl_cli
+SRCS = sms_app.c circular_buffer.c sensor_thread.c processor_thread.c alert_thread.c logger_thread.c
 
-sms_app: sms_app.c
-	$(CC_ARM) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+all: sms_app sms_app_x86
 
-sms_app_x86: sms_app.c
-	$(CC_HOST) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+sms_app: $(SRCS)
+	$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-ioctl_cli: ioctl_cli.c
-	$(CC_ARM) $(CFLAGS) -o $@ $^
+sms_app_x86: $(SRCS)
+	gcc -g -Wall -Wextra -pthread -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f sms_app sms_app_x86 ioctl_cli *.o
+	rm -f sms_app sms_app_x86

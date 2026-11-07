@@ -1,0 +1,73 @@
+The target architecture is set to "arm".
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+0x00010254 in _start ()
+Breakpoint 1 at 0x1040e: file buggy_app.c, line 26.
+Breakpoint 2 at 0x1035e: file buggy_app.c, line 6.
+Breakpoint 3 at 0x103a8: file buggy_app.c, line 14.
+Breakpoint 4 at 0x103de: file buggy_app.c, line 21.
+Breakpoint 5 at 0x10368: file buggy_app.c, line 8.
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x0001040e in main at buggy_app.c:26
+2       breakpoint     keep y   0x0001035e in process_data at buggy_app.c:6
+3       breakpoint     keep y   0x000103a8 in create_message at buggy_app.c:14
+4       breakpoint     keep y   0x000103de in calculate at buggy_app.c:21
+5       breakpoint     keep y   0x00010368 in process_data at buggy_app.c:8
+	stop only if i == len
+
+Breakpoint 1, main (argc=1, argv=0x407ffff4) at buggy_app.c:26
+26	int main(int argc, char *argv[]) {
+
+--- Dang o main ---
+#0  main (argc=1, argv=0x407ffff4) at buggy_app.c:26
+
+Breakpoint 2, process_data (data=0x407ffe70, len=5) at buggy_app.c:6
+6	    int sum = 0;
+
+--- BUG 1: process_data ---
+#0  process_data (data=0x407ffe70, len=5) at buggy_app.c:6
+#1  0x00010450 in main (argc=1, argv=0x407ffff4) at buggy_app.c:30
+#1  0x00010450 in main (argc=1, argv=0x407ffff4) at buggy_app.c:30
+30	    process_data(arr, 5);
+$1 = {10, 20, 30, 40, 50}
+$2 = {10, 20, 30, 40, 50}
+#0  process_data (data=0x407ffe70, len=5) at buggy_app.c:6
+6	    int sum = 0;
+$3 = 5
+
+Breakpoint 5, process_data (data=0x407ffe70, len=5) at buggy_app.c:8
+8	        sum += data[i];
+
+--- BUG 1: i == len, doc ngoai mang ---
+$4 = 5
+$5 = (int *) 0x407ffe84
+$6 = -682500864
+pc             0x10368             0x10368 <process_data+20>
+sp             0x407ffe48          0x407ffe48
+lr             0x10451             66641
+#0  process_data (data=0x407ffe70, len=5) at buggy_app.c:8
+#1  0x00010450 in main (argc=1, argv=0x407ffff4) at buggy_app.c:30
+
+Breakpoint 3, create_message (text=0x491ac "Hello Embedded Linux") at buggy_app.c:14
+14	    char *buf = malloc(strlen(text) + 1);
+
+--- BUG 2: use after free ---
+15	    strcpy(buf, text);
+16	    free(buf);
+17	    return buf;
+$7 = 0x75050 "u"
+0x75050:	"u"
+#0  create_message (text=0x491ac "Hello Embedded Linux") at buggy_app.c:17
+#1  0x00010464 in main (argc=1, argv=0x407ffff4) at buggy_app.c:32
+
+Breakpoint 4, calculate (a=100000, b=100000) at buggy_app.c:21
+21	    int result = a * b;
+
+--- BUG 3: integer overflow ---
+22	    printf("calculate(%d, %d) = %d\n", a, b, result);
+$8 = 1410065408
+$9 = 10000000000
+[Inferior 1 (process 62736) exited normally]

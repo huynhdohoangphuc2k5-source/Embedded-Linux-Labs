@@ -1,0 +1,5 @@
+Kernel host: 7.0.0-38-generic
+GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1
+valgrind-3.26.0
+perf version 7.0.14
+Thu Oct 29 06:27:51 PM +07 2026
