@@ -14,3 +14,5 @@ lab02/test_apps/code_ai
 lab02/test_apps/lech_hay_gap
 *.save
 lab03/apps/buggy_app
+lab03/apps/leaky_app
+lab03/apps/leaky_app_fixed
